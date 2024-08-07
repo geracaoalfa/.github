@@ -1,7 +1,9 @@
 name: Create or Update Pull Request on Branch Creation
 
 on:
-  workflow_call:
+  push:
+    branches:
+      - '*'
 
 jobs:
   create-or-update-pull-request:
