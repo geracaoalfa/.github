@@ -14,15 +14,17 @@ jobs:
     - name: Get commit messages
       id: get_commits
       run: |
-        git log origin/master..HEAD --pretty=format:"%h %s" > commit_messages.txt
+        git log origin/main..HEAD --pretty=format:"%h %s" > commit_messages.txt
         cat commit_messages.txt
 
     - name: Install GitHub CLI
       run: |
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-        sudo apt-add-repository https://cli.github.com/packages
-        sudo apt update
-        sudo apt install gh
+        sudo apt-get update
+        sudo apt-get install -y curl
+        curl -sSL https://github.com/cli/cli/releases/download/v2.14.7/gh_2.14.7_linux_amd64.tar.gz -o ghcli.tar.gz
+        tar -xzf ghcli.tar.gz
+        sudo mv gh_2.14.7_linux_amd64/bin/gh /usr/local/bin/
+        gh --version
 
     - name: Authenticate GitHub CLI
       run: gh auth login --with-token <<< "${{ secrets.MY_GITHUB_PAT }}"
@@ -46,7 +48,7 @@ jobs:
       with:
         token: ${{ secrets.MY_GITHUB_PAT }}
         branch: ${{ github.ref }}
-        base: master
+        base: main
         title: '${{ github.ref }} - Automatic Pull Request #${{ steps.get_next_pr_number.outputs.pr_number }}'
         body: |
           This pull request is automatically created or updated when a new branch is pushed.
