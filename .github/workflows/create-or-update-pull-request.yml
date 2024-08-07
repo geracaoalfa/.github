@@ -14,7 +14,7 @@ jobs:
     - name: Get commit messages
       id: get_commits
       run: |
-        git log origin/${{ github.ref_name }}..HEAD --pretty=format:"%h %s" > commit_messages.txt
+        git log origin/$(echo ${{ github.ref_name }})..HEAD --pretty=format:"%h %s" > commit_messages.txt
         cat commit_messages.txt
 
     - name: Get existing PR number
@@ -45,8 +45,15 @@ jobs:
           - Branch: ${{ github.ref }}
 
           ## Commits:
-          $(cat commit_messages.txt)
+          $(cat commit_messages.txt | sed ':a;N;$!ba;s/\n/\\n/g')
         committer: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
         author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
         delete-branch: false
         update-existing-pr: true
+    
+    - name: Update Pull Request
+      if: steps.get_existing_pr.outputs.pr_number != ''
+      run: |
+        gh pr edit ${{ steps.get_existing_pr.outputs.pr_number }} --body "$(cat commit_messages.txt | sed ':a;N;$!ba;s/\n/\\n/g')"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
