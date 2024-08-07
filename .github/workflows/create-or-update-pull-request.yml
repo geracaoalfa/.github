@@ -40,7 +40,6 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         branch: ${{ github.ref_name }}
-        base: master
         title: '${{ github.ref_name }} - #${{ steps.get_next_pr_number.outputs.pr_number }}'
         body: |
           This pull request is automatically created or updated when a new branch is pushed.
