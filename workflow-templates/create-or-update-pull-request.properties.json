@@ -1,0 +1,4 @@
+{
+  "name": "Create or Update Pull Request",
+  "description": "A workflow to create or update a pull request when a new branch is pushed."
+}
