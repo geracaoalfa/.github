@@ -52,10 +52,3 @@ jobs:
         author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
         delete-branch: false
         update-existing-pr: true
-    
-    - name: Update Pull Request
-      if: steps.get_existing_pr.outputs.pr_number != ''
-      run: |
-        gh pr edit ${{ steps.get_existing_pr.outputs.pr_number }} --body "$(cat commit_messages.txt | sed ':a;N;$!ba;s/\n/\\n/g')"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
