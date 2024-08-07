@@ -39,7 +39,7 @@ jobs:
       uses: peter-evans/create-pull-request@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.head_ref }}
+        branch: ${{ github.ref_name }}
         base: master
         title: '${{ github.ref_name }} - #${{ steps.get_next_pr_number.outputs.pr_number }}'
         body: |
