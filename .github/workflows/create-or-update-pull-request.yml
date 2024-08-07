@@ -5,10 +5,6 @@ on:
 
 jobs:
   create-or-update-pull-request:
-    permissions:
-      contents: write
-      pull-requests: write
-      repository-projects: write
     runs-on: ubuntu-latest
 
     steps:
@@ -20,20 +16,6 @@ jobs:
       run: |
         git log origin/master..HEAD --pretty=format:"%h %s" > commit_messages.txt
         cat commit_messages.txt
-
-    - name: Install GitHub CLI
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y curl
-        curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-        sudo apt-get update
-        sudo apt-get install gh
-
-    - name: Authenticate GitHub CLI
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
     - name: Get existing PR number
       id: get_existing_pr
@@ -53,7 +35,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create or Update Pull Request
-      if: steps.get_existing_pr.outputs.pr_number == ''
       id: create_pr
       uses: peter-evans/create-pull-request@v4
       with:
@@ -72,10 +53,3 @@ jobs:
         delete-branch: false
         branch-suffix: timestamp
         update-existing-pr: true
-
-    - name: Update Pull Request
-      if: steps.get_existing_pr.outputs.pr_number != ''
-      run: |
-        gh pr edit ${{ steps.get_existing_pr.outputs.pr_number }} --body "$(cat commit_messages.txt)"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
