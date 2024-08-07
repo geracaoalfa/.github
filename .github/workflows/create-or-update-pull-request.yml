@@ -17,13 +17,21 @@ jobs:
         git log origin/master..HEAD --pretty=format:"%h %s" > commit_messages.txt
         cat commit_messages.txt
 
+    - name: Install GitHub CLI
+      run: |
+        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+        sudo apt-add-repository https://cli.github.com/packages
+        sudo apt update
+        sudo apt install gh
+
+    - name: Authenticate GitHub CLI
+      run: gh auth login --with-token <<< "${{ secrets.MY_GITHUB_PAT }}"
+
     - name: Get existing PR number
       id: get_existing_pr
       run: |
         pr_number=$(gh pr list --head ${{ github.ref }} --json number --jq '.[0].number')
         echo "::set-output name=pr_number::$pr_number"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get next PR number if no existing PR
       if: steps.get_existing_pr.outputs.pr_number == ''
@@ -31,14 +39,12 @@ jobs:
       run: |
         next_pr_number=$(($(gh pr list --json number --jq '.[].number' | sort -nr | head -n1) + 1))
         echo "::set-output name=pr_number::$next_pr_number"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create or Update Pull Request
       id: create_pr
       uses: peter-evans/create-pull-request@v4
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.MY_GITHUB_PAT }}
         branch: ${{ github.ref }}
         base: master
         title: '${{ github.ref }} - Automatic Pull Request #${{ steps.get_next_pr_number.outputs.pr_number }}'
