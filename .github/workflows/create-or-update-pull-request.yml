@@ -14,7 +14,7 @@ jobs:
     - name: Get commit messages
       id: get_commits
       run: |
-        git log origin/main..HEAD --pretty=format:"%h %s" > commit_messages.txt
+        git log origin/master..HEAD --pretty=format:"%h %s" > commit_messages.txt
         cat commit_messages.txt
 
     - name: Get existing PR number
@@ -40,7 +40,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         branch: ${{ github.ref }}
-        base: main
+        base: master
         title: '${{ github.ref }} - Automatic Pull Request #${{ steps.get_next_pr_number.outputs.pr_number }}'
         body: |
           This pull request is automatically created or updated when a new branch is pushed.
