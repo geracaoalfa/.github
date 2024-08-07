@@ -14,7 +14,7 @@ jobs:
     - name: Get commit messages
       id: get_commits
       run: |
-        git log origin/${{ github.ref_name }} --pretty=format:"%h %s" > commit_messages.txt
+        git log origin/${{ github.ref_name }}..HEAD --pretty=format:"%h %s" > commit_messages.txt
         cat commit_messages.txt
 
     - name: Get existing PR number
